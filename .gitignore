@@ -5,3 +5,13 @@
 .sass-cache
 __pycache__
 _site
+files/*.gtf
+files/*.fb
+files/*.fastq
+files/*.tsv
+scratch/
+
+# Install jekyll via bundle (e.g. bundle install --path vendor/bundle)
+Gemfile.lock
+vendor/bundle
+.bundle

@@ -1,6 +1,6 @@
 ---
-layout: page
 title: Discussion
-permalink: /discuss/
 ---
-FIXME
+## Frequently Asked Questions
+
+{% include links.md %}
