@@ -34,17 +34,17 @@ writeln('If we can see this, everything works!');
 This program can then be compiled with the following bash command:
 
 ~~~
-chpl --fast hello.chpl -o hello.o
+chpl --fast hello.chpl -o hello
 ~~~
 {: .bash}
 
 The flag `--fast` indicates the compiler to optimise the binary to run as fast as possible in the given architecture.
-The `-o` option tells Chapel what to call the final output program, in this case `hello.o`.
+The `-o` option tells Chapel what to call the final output program, in this case `hello`.
 
 To run the code, you execute it as you would any other program:
 
 ~~~
-./hello.o
+./hello
 ~~~
 {: .bash}
 ```
@@ -80,20 +80,20 @@ salloc --time=0:30:0 --ntasks=1 --cpus-per-task=3 --mem-per-cpu=1000 --account=d
 and then inside that job compile and run the test code
 
 ~~~
-chpl --fast hello.chpl -o hello.o
-./hello.o
+chpl --fast hello.chpl -o hello
+./hello
 ~~~
 {: .bash}
 
 For production jobs, you would compile the code and then submit a batch script to the queue:
 
 ~~~
-chpl --fast hello.chpl -o hello.o
+chpl --fast hello.chpl -o hello
 sbatch script.sh
 ~~~
 {: .bash}
 
-where the script `script.sh` would set all Slurm variables and call the executable `mybinary`.
+where the script `script.sh` would set all Slurm variables and call the executable `hello`.
 
 ## Case study
 
