@@ -277,6 +277,9 @@ def check_fileset(source_dir, reporter, filenames_present):
                    'Duplicate episode numbers {0} vs {1}',
                    sorted(seen), sorted(set(seen)))
 
+    # TODO: (CW) Turned off for now
+    return
+
     # Check that numbers are consecutive.
     seen = sorted([int(s) for s in seen])
     clean = True
