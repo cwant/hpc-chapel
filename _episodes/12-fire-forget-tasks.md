@@ -40,13 +40,13 @@ begin
 
 writeln('this is main thread, I am done...');
 ~~~
-{:.source}
+{: .source}
  
- ~~~
- >> chpl begin_example.chpl -o begin_example
- >> ./begin_example
- ~~~
- {:.input}
+```
+>> chpl begin_example.chpl -o begin_example
+>> ./begin_example
+```
+{: .input}
  
  ~~~
 This is the main thread starting first task
@@ -77,7 +77,7 @@ thread 1: 98
 thread 1: 99
 thread 1: 100
 ~~~
-{:.output}
+{: .output}
 
 As you can see the order of the output is not what we would expected, and actually it is completely unpredictable. This is a well known effect of concurrent tasks accessing the same shared resource at the same time (in this case the screen); the system decides in which order the tasks could write to the screen. 
 
@@ -87,8 +87,8 @@ As you can see the order of the output is not what we would expected, and actual
 > Discuss your observations.
 >> ## Key idea
 >> All variables have a **_scope_** in which they can be used. The variables declared inside a concurrent tasks are accessible only by the task. The variables declared in the main task can be read everywhere, but Chapel won't allow two concurrent tasks to try to modify them. 
-> {:.solution}
-{:.discussion}
+> {: .solution}
+{: .discussion}
 
 > ## Try this...
 > Are the concurrent tasks, spawned by the last code, running truly in parallel?
@@ -105,13 +105,13 @@ As you can see the order of the output is not what we would expected, and actual
 >     }
 >  }
 > ~~~
-> {:.source}
+> {: .source}
 >
 > Now submit your job asking for different amount of resources, and use system tools such as `top`or `ps` to monitor the execution of the code.
 >> ## Key idea
 >> To maximise performance, start as many tasks as cores are available
->{:.solution}
-{:.challenge}
+>{: .solution}
+{: .challenge}
 
 A slightly more structured way to start concurrent tasks in Chapel is by using the `cobegin`statement. Here you can start a block of concurrent tasks, one for each statement inside the curly brackets. The main difference between the `begin`and `cobegin` statements is that with the `cobegin`, all the spawned tasks are synchronised at the end of the statement, i.e. the main thread won't continue its execution until all tasks are done. 
 
@@ -130,21 +130,21 @@ cobegin
 
 writeln("this message won't appear until all tasks are done...");
 ~~~
-{:.source}
+{: .source}
 
-~~~
- >> chpl cobegin_example.chpl -o cobegin_example
- >> ./cobegin_example
- ~~~
- {:.input}
+```
+>> chpl cobegin_example.chpl -o cobegin_example
+>> ./cobegin_example
+```
+{: .input}
  
- ~~~
+~~~
 This is the main thread, my value of x is 0
 this is task 2, my value of x is 0
 this is task 1, my value of x is 5
 this message won't appear until all tasks are done...
- ~~~
- {:.output}
+~~~
+{: .output}
 
 As you may have conclude from the Discussion exercise above, the variables declared inside a task are accessible only by the task, while those variables declared in the main task are accessible to all tasks. 
 
@@ -170,13 +170,13 @@ coforall taskid in 1..numoftasks do
 
 writeln("this message won't appear until all tasks are done...");
 ~~~
-{:.source}
+{: .source}
 
 ~~~
  >> chpl coforall_example.chpl -o coforall_example
  >> ./coforall_example --numoftasks=5
  ~~~
- {:.input}
+ {: .input}
  
  ~~~
 This is the main task: x = 1
@@ -187,7 +187,7 @@ this is task 3: x + 3 = 4. My value of c is: 4
 this is task 1: x + 1 = 2. My value of c is: 2
 this message won't appear until all tasks are done...
  ~~~
- {:.output}
+ {: .output}
  
 Notice how we are able to customise the instructions inside the coforall, to give different results depending on the task that is executing them. Also, notice how, once again, the variables declared outside the coforall can be read by all tasks, while the variables declared inside, are available only to the particular task. 
 
@@ -214,13 +214,13 @@ Notice how we are able to customise the instructions inside the coforall, to giv
 >> for i in 1..numoftasks do writeln(messages[i]);
 >> writeln("this message won't appear until all tasks are done...");
 >> ~~~
->> {:.source}
+>> {: .source}
 >>
 >> ~~~
 >> chpl exercise_coforall.chpl -o exercise_coforall
 >> ./exercise_coforall --numoftasks=5
 >> ~~~
->> {:.input}
+>> {: .input}
 >>
 >> ~~~
 This is the main task: x = 1
@@ -231,11 +231,11 @@ this is task 4: x + 4 = 5. My value of c is: 5
 this is task 5: x + 5 = 6. My value of c is: 6
 this message won't appear until all tasks are done...
 >> ~~~
->> {:.output}
+>> {: .output}
 >>
 >> Note that `+` is a **_polymorphic_** operand in Chapel. In this case it concatenates `strings` with `integers` (which are transformed to strings). 
-> {:.solution}
-{:.challenge}
+> {: .solution}
+{: .challenge}
 
 > ## Exercise 2
 > Consider the following code:
@@ -250,7 +250,7 @@ this message won't appear until all tasks are done...
 >
 > writeln("the maximum value in x is: ",mymax);
 > ~~~
-> {:.source}
+> {: .source}
 > Write a parallel code to find the maximum value in the array x
 >> ## Solution
 >> ~~~
@@ -284,45 +284,47 @@ this message won't appear until all tasks are done...
 >>   if d[i]>mymax then mymax=d[i];
 >> }
 >> ~~~
->> {:.source}
+>> {: .source}
 >>
 >> ~~~
 >> >> chpl --fast exercise_coforall_2.chpl -o exercise_coforall_2
 >> >> ./exercise_coforall_2 
 >> ~~~
->> {:.input}
+>> {: .input}
 >>
 >> ~~~
 >> the maximum value in x is: 1.0
 >> ~~~
->> {:.output}
+>> {: .output}
 >>
 >> We use the coforall to spawn tasks that work concurrently in a fraction of the array. The trick here is to determine, based on the _taskid_, the initial and final indices that the task will use. Each task obtains the maximum in its fraction of the array, and finally, after the coforall is done, the main task obtains the maximum of the array from the maximums of all tasks.  
-> {:.solution}
-{:.challenge}
+> {: .solution}
+{: .challenge}
 
 > ## Discussion
 > Run the code of last Exercise using different number of tasks, and different sizes of the array _x_ to see how the execution time changes. For example:
 > ~~~
 > >> time ./exercise_coforall_2 --nelem=3000 --numoftasks=4
 > ~~~
-> {:.input}
+> {: .input}
 >
 > Discuss your observations. Is there a limit on how fast the code could run?
-{:.discussion}
+{: .discussion}
 
 > ## Try this...
 > Substitute the code to find _mymax_ in the last exercise with:
 > ~~~
 > mymax=max reduce x;
 > ~~~
-> {:.source}
+> {: .source}
 > Time the execution of the original code and this new one. How do they compare?
 >
 >> ## Key idea
 >> It is always a good idea to check whether there is _built-in_ functions or methods in the used language, that can do what we want to do as efficiently (or better) than our house-made code. In this case, the _reduce_ statement reduces the given array to a single number using the given operation (in this case max), and it is parallelized and optimised to have a very good performance. 
->{:.solution}
-{:.challenge}
+>{: .solution}
+{: .challenge}
 
 
 The code in these last Exercises somehow _synchronise_ the tasks to obtain the desired result. In addition, Chapel has specific mechanisms task synchronisation, that could help us to achieve fine-grained parallelization. 
+
+{% include links.md %}

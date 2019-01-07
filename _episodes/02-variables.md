@@ -195,3 +195,5 @@ const mindif = 0.0001: real;    // smallest difference in temperature that would
 const n = 20: int;              // the temperature at the desired position will be printed every n iterations
 ```
 {: .source}
+
+{% include links.md %}

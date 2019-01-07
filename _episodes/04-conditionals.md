@@ -152,10 +152,10 @@ while (c < niter) do
 }
 ```
 {: .source}
-~~~
+```
 chpl base_solution.chpl -o base_solution.o
 ./base_solution.o
-~~~
+```
 {: .bash}
 ```
 This simulation will consider a matrix of 100 by 100 elements.
@@ -189,3 +189,5 @@ Temperature at iteration 500: 25.0
 {:.output}
 
 Of course the temperature is always 25.0 at any iteration other than the initial one, as we haven't done any computation yet.
+
+{% include links.md %}

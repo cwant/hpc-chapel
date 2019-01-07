@@ -37,7 +37,7 @@ while (c<niter && curdif>=mindif) do {
   if c%n == 0 then writeln('Temperature at iteration ',c,': ',temp[x,y]);
 }
 ~~~
-{:.source}
+{: .source}
 
 Note that now the nested for loops run from `rowi` to `rowf` and from `coli` to `colf` which are, respectively, the initial and final row and column of the sub-grid associated to the task `taskid`. To compute these limits, based on `taskid`, we can again follow the same ideas as in Exercise 2.
 
@@ -86,15 +86,15 @@ while (c<niter && curdif>=mindif) do {
 	
 }
 ~~~
-{:.source}
+{: .source}
 
 As you can see, to divide a data set (the array `temp` in this case) between concurrent tasks, could be cumbersome. Chapel provides high-level abstractions for data parallelism that take care of all the data distribution for us. We will study data parallelism in the following lessons, but for now, let's compare the benchmark solution with our `coforall` parallelization to see how the performance improved. 
 
-~~~
+```
 >> chpl --fast parallel_solution_1.chpl -o parallel1
 >> ./parallel1 --rows=650 --cols=650 --x=200 --y=300 --niter=10000 --mindif=0.002 --n=1000
-~~~
-{:.input}
+```
+{: .input}
 
 ~~~
 The simulation will consider a matrix of 650 by 650 elements,
@@ -116,7 +116,7 @@ The simulation took 17.0193 seconds
 Final temperature at the desired position after 7750 iterations is: 24.9671
 The greatest difference in temperatures between the last two iterations was: 0.00199985
 ~~~
-{:.output}
+{: .output}
 
 This parallel solution, using 4 parallel tasks, took around 17 seconds to finish. Compared with the ~20 seconds needed by the benchmark solution, seems not very impressive. To understand the reason, let's analyse the code's flow. When the program starts, the main thread does all the declarations and initialisations, and then, it enters the main loop of the simulation (the **_while loop_**). Inside this loop, the parallel tasks are launched for the first time. When these tasks finish their computations, the main task resumes its execution, it updates `curdif`, and everything is repeated again. So, in essence, parallel tasks are launched and resumed 7750 times, which introduces a significant amount of overhead (the time the system needs to effectively start and destroy threads in the specific hardware, at each iteration of the while loop). 
 
@@ -174,7 +174,7 @@ coforall taskid in 0..coltasks*rowtasks-1 do {
   }
 }
 ~~~
-{:.source}
+{: .source}
     
 The problem with this approach is that now we have to explicitly synchronise the tasks. Before, `curdif` and `past_temp` were updated only by the main task at each iteration; similarly, only the main task was printing results. Now, all these operations must be carried inside the coforall loop, which imposes the need of synchronisation between tasks. 
 
@@ -219,7 +219,7 @@ coforall taskid in 0..coltasks*rowtasks-1 do
   }
 }     
 ~~~
-{:.source}
+{: .source}
 
 > ## Exercise 4
 > Use `sync` or `atomic` variables to implement the synchronisation required in the code above.
@@ -252,17 +252,17 @@ coforall taskid in 0..coltasks*rowtasks-1 do
 >>    }
 >> }
 >> ~~~
->> {:.source} 
-> {:.solution}
-{:.challenge} 
+>> {: .source} 
+> {: .solution}
+{: .challenge} 
 
 Using the solution in the Exercise 4, we can now compare the performance with the benchmark solution
 
-~~~
+```
 >> chpl --fast parallel_solution_2.chpl -o parallel2
 >> ./parallel2 --rows=650 --cols=650 --x=200 --y=300 --niter=10000 --mindif=0.002 --n=1000
-~~~
-{:.input}
+```
+{: .input}
 
 ~~~
 The simulation will consider a matrix of 650 by 650 elements,
@@ -284,7 +284,7 @@ The simulation took 4.2733 seconds
 Final temperature at the desired position after 7750 iterations is: 24.9671
 The greatest difference in temperatures between the last two iterations was: 0.00199985
 ~~~
-{:.output}
+{: .output}
 
 to see that we now have a code that performs 5x faster. 
 
@@ -309,6 +309,8 @@ coforall (i,j) in {1..n,1..n} by (stride,stride) { // 5x5 decomposition into 20x
   }
 }
 ~~~
-{:.source}
+{: .source}
 
 We will study data parallelism in more detail in the next section.
+
+{% include links.md %}

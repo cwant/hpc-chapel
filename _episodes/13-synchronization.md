@@ -46,13 +46,13 @@ begin
 
 writeln('this is main thread, I am done...');
 ~~~
-{:.source}
+{: .source}
 
-~~~
+```
 >> chpl sync_example_1.chpl -o sync_example_1
 >> ./sync_example_1 
-~~~
-{:.input}
+```
+{: .input}
 
 ~~~
 This is the main thread starting a synchronous task
@@ -80,7 +80,7 @@ thread 2: 8
 thread 2: 9
 thread 2: 10
 ~~~
-{:.output}
+{: .output}
 
 > ## Discussion
 > What would happen if we write instead 
@@ -99,9 +99,9 @@ begin
 }
 writeln("The first task is done...");
 > ~~~
-> {:.source}
+> {: .source}
 > Discuss your observations. 
-{:.discussion}
+{: .discussion}
 
 > ## Exercise 3
 > Use `begin` and `sync` statements to reproduce the functionality of `cobegin` in cobegin_example.chpl.
@@ -122,9 +122,9 @@ writeln("The first task is done...");
 >>
 >> writeln("this message won't appear until all tasks are done...");
 >> ~~~
->> {:.source}
-> {:.solution}
-{:.challenge}
+>> {: .source}
+> {: .solution}
+{: .challenge}
 
 A more elaborated and powerful use of `sync` is as a type qualifier for variables. When a variable is declared as _sync_, a state that can be **_full_** or **_empty_** is associated to it.  
 
@@ -143,13 +143,13 @@ writeln("this is main task after launching new task... I will wait until  it is 
 a = x;   // don't run this line until the variable x is written in the other task
 writeln("and now it is done");
 ~~~
-{:.source}
+{: .source}
 
-~~~
+```
 >> chpl sync_example_2.chpl -o sync_example_2
 >> ./sync_example_2
-~~~
-{:.input}
+```
+{: .input}
 
 ~~~
 this is main task launching a new task
@@ -167,15 +167,15 @@ this is new task working: 10
 New task finished
 and now it is done
 ~~~
-{:.output}
+{: .output}
 
 > ## Discussion
 > What would happen if we assign a value to _x_ right before launching the new task? What would happen if we assign a value to _x_ right before launching the new task and after the _writeln("and now it is done");_ statement? Discuss your observations
-{:.discussion}
+{: .discussion}
 
 There are a number of methods defined for _sync_ variables. Suppose _x_ is a sync variable of a given type, 
 
-~~~
+```
 // general methods
 x.reset()	//will set the state as empty and the value as the default of x's type
 x.isfull()	//will return true is the state of x is full, false if it is empty
@@ -193,7 +193,7 @@ x.readFF()		//will block until the state of x is full,
 //non-blocking read and write methods
 x.writeXF(value)	//will assign the value no matter the state of x, and then set the state as full
 x.readXX()		//will return the value of x regardless its state. The state will remain unchanged
-~~~
+```
 
 Chapel also implements **_atomic_** operations with variables declared as `atomic`, and this provides another option to synchronise tasks. Atomic operations run completely independently of any other thread or process. This means that when several tasks try to write an atomic variable, only one will succeed at a given moment, providing implicit synchronisation between them. There is a number of methods defined for atomic variables, among them `sub()`, `add()`, `write()`, `read()`, and `waitfor()` are very useful to establish explicit synchronisation between tasks, as showed in the next code:
 
@@ -211,13 +211,13 @@ coforall id in 1..numtasks
     writeln("task ",id," is done...");
 }
 ~~~
-{:.source}
+{: .source}
 
-~~~
+```
 >> chpl atomic_example.chpl -o atomic_example
 >> ./atomic_example
-~~~
-{:.input}
+```
+{: .input}
 
 ~~~
 greetings form task 4... I am waiting for all tasks to say hello
@@ -231,10 +231,12 @@ task 2 is done...
 task 3 is done...
 task 4 is done...
 ~~~
-{:.output}
+{: .output}
 
 > ## Try this...
 > Comment out the line `lock.waitfor(numtasks)` in the code above to clearly observe the effect of the task synchronisation.
-{:.challenge}
+{: .challenge}
 
 Finally, with all the material studied so far, we should be ready to parallelize our code for the simulation of the heat transfer equation.
+
+{% include links.md %}

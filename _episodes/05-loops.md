@@ -28,7 +28,7 @@ for i in 1..rows do
   //do this for every row 
 }
 ~~~
-{:.source}
+{: .source}
 
 will allow us to iterate over the rows of `temp`. Now, for each row we also need to iterate over all the columns in order to access every single element of `temp`. This can be done with nested for loops like this
 
@@ -43,7 +43,7 @@ for i in 1..rows do
   }
 }     
 ~~~
-{:.source}
+{: .source}
 
 Now, inside the inner loop, we can use the indices `i` and `j` to perform the required computations as follows:
 
@@ -60,17 +60,17 @@ for i in 1..rows do
 }     
 past_temp=temp;
 ~~~
-{:.source}
+{: .source}
 
 Note that at the end of the outer for-loop, when all the elements in `temp` are already calculated, we update `past_temp` with the values of `temp`; this way everything is set up for the next iteration of the main while statement.
 
 Now let's compile and execute our code again:
 
-~~~
+```
 >> chpl base_solution.chpl -o base_solution
 >> ./base_solution
-~~~
-{:.input}
+```
+{: .input}
 
 ~~~
 The simulation will consider a matrix of 100 by 100 elements,
@@ -106,7 +106,7 @@ Temperature at iteration 460: 24.913
 Temperature at iteration 480: 24.8883
 Temperature at iteration 500: 24.8595
 ~~~
-{:.output}
+{: .output}
 
 As we can see, the temperature in the middle of the plate (position 50,50) is slowly decreasing as the plate is cooling down. 
 
@@ -118,7 +118,7 @@ As we can see, the temperature in the middle of the plate (position 50,50) is sl
 >> >> chpl base_solution.chpl -o base_solution
 >> >> ./base_solution
 >> ~~~
->> {:.input}
+>> {: .input}
 >> ~~~
 >> The simulation will consider a matrix of 100 by 100 elements,
 >> it will run up to 500 iterations, or until the largest difference
@@ -134,9 +134,9 @@ As we can see, the temperature in the middle of the plate (position 50,50) is sl
 >> Temperature at iteration 480: 0.0661081
 >> Temperature at iteration 500: 0.0634717
 >> ~~~
->> {:.output}
-> {:.solution}
-{:.challenge}
+>> {: .output}
+> {: .solution}
+{: .challenge}
 
 > ## Exercise 2
 > Now let's have some more interesting boundary conditions. Suppose that the plate is heated by a source of 80 degrees located at the bottom right corner, and that the temperature on the rest of the border decreases linearly as one gets farther form the corner (see the image below). Utilise for loops to setup the described boundary conditions. Compile and run your code to see how the temperature is changing now. 
@@ -155,13 +155,13 @@ As we can see, the temperature in the middle of the plate (position 50,50) is sl
 >>   temp[rows+1,j]=j*80.0/cols;
 >> }
 >> ~~~
->> {:.source}
+>> {: .source}
 >> Note that the boundary conditions must be set in both arrays, `past_temp` and `temp`, otherwise, they will be set to zero again after the first iteration. Also note that 80 degrees are written as a real number 80.0. The division of integers in Chapel returns an integer, then, as `rows` and `cols` are integers, we must have 80 as real so that the quotient is not truncated. 
 >> ~~~
 >> >> chpl base_solution.chpl -o base_solution
 >> >> ./base_solution
 >> ~~~
->> {:.input}
+>> {: .input}
 >> ~~~
 >> The simulation will consider a matrix of 100 by 100 elements,
 >> it will run up to 500 iterations, or until the largest difference
@@ -177,9 +177,9 @@ As we can see, the temperature in the middle of the plate (position 50,50) is sl
 >> Temperature at iteration 480: 0.824959
 >> Temperature at iteration 500: 0.823152
 >> ~~~
->> {:.output}
-> {:.solution}
-{:.challenge}
+>> {: .output}
+> {: .solution}
+{: .challenge}
 
 > ## Exercise 3
 > So far, `curdif` has been always equal to `mindif`, which means that our main while loop will always run the 500 iterations. So let's update `curdif` after each iteration. Use what we have studied so far to write the required piece of code.
@@ -197,13 +197,13 @@ As we can see, the temperature in the middle of the plate (position 50,50) is sl
 >>   }
 >> }
 >> ~~~
->> {:.source}
+>> {: .source}
 >> Clearly there is no need to keep the difference at every single position in the array, we just need to update `curdif` if we find a greater one. 
 >> ~~~
 >> >> chpl base_solution.chpl -o base_solution
 >> >> ./base_solution
 >> ~~~
->> {:.input}
+>> {: .input}
 >> ~~~
 >> The simulation will consider a matrix of 100 by 100 elements,
 >> it will run up to 500 iterations, or until the largest difference
@@ -219,9 +219,9 @@ As we can see, the temperature in the middle of the plate (position 50,50) is sl
 >> Temperature at iteration 480: 0.824959
 >> Temperature at iteration 500: 0.823152
 >> ~~~
->> {:.output}
-> {:.solution}
-{:.challenge}
+>> {: .output}
+> {: .solution}
+{: .challenge}
 
 Now, after Exercise 3 we should have a working program to simulate our heat transfer equation. Let's just print some additional useful information,
 
@@ -230,15 +230,15 @@ Now, after Exercise 3 we should have a working program to simulate our heat tran
 writeln('\nFinal temperature at the desired position after ',c,' iterations is: ',temp[x,y]);
 writeln('The difference in temperatures between the last two iterations was: ',curdif,'\n');
 ~~~
-{:.source}
+{: .source}
 
 and compile and execute our final code,
 
-~~~
+```
 >> chpl base_solution.chpl -o base_solution
 >> ./base_solution
-~~~
-{:.input}
+```
+{: .input}
 
 ~~~
 The simulation will consider a matrix of 100 by 100 elements,
@@ -277,4 +277,6 @@ Temperature at iteration 500: 0.823152
 Final temperature at the desired position after 500 iterations is: 0.823152
 The greatest difference in temperatures between the last two iterations was: 0.0258874
 ~~~
-{:.output}
+{: .output}
+
+{% include links.md %}

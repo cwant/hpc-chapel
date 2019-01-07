@@ -17,19 +17,19 @@ No need to say that this would be very tedious and inefficient. A better scenari
 ~~~
 config const niter = 500;    //number of iterations
 ~~~
-{:.source}
+{: .source}
 
-~~~
+```
 >> chpl base_solution.chpl -o base_solution
-~~~
-{:.input}
+```
+{: .input}
 
 it can be initialised with a specific value, when executing the code at the command line, using the syntax:
 
-~~~
+```
 >> ./base_solution --niter=3000
-~~~
-{:.input}
+```
+{: .input}
 
 ~~~
 The simulation will consider a matrix of 100 by 100 elements,
@@ -48,7 +48,7 @@ Temperature at iteration 3000: 0.793947
 Final temperature at the desired position after 3000 iterations is: 0.793947
 The greatest difference in temperatures between the last two iterations was: 0.000350086
 ~~~
-{:.output}
+{: .output}
 
 > ## Exercise 4
 > Make `n`, `x`, `y`, `mindif`, `rows` and `cols` configurable variables, and test the code simulating different configurations. What can you conclude about the performance of the code?
@@ -57,7 +57,7 @@ The greatest difference in temperatures between the last two iterations was: 0.0
 >> ~~~
 >> >> ./base_solution --rows=650 --cols=650 --x=200 --y=300 --niter=10000 --mindif=0.002 --n=1000
 >> ~~~
->> {:.input}
+>> {: .input}
 >> ~~~
 >> The simulation will consider a matrix of 650 by 650 elements,
 >> it will run up to 10000 iterations, or until the largest difference
@@ -77,6 +77,8 @@ The greatest difference in temperatures between the last two iterations was: 0.0
 >> Final temperature at the desired position after 7750 iterations is: 24.9671
 >> The greatest difference in temperatures between the last two iterations was: 0.00199985
 >> ~~~
->> {:.output}
-> {:.solution}
-{:.challenge}
+>> {: .output}
+> {: .solution}
+{: .challenge}
+
+{% include links.md %}

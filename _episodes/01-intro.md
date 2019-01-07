@@ -33,9 +33,9 @@ writeln('If we can see this, everything works!');
 
 This program can then be compiled with the following bash command:
 
-~~~
+```
 chpl --fast hello.chpl -o hello
-~~~
+```
 {: .bash}
 
 The flag `--fast` indicates the compiler to optimise the binary to run as fast as possible in the given architecture.
@@ -43,9 +43,9 @@ The `-o` option tells Chapel what to call the final output program, in this case
 
 To run the code, you execute it as you would any other program:
 
-~~~
+```
 ./hello
-~~~
+```
 {: .bash}
 ```
 If we can see this, everything works!
@@ -64,33 +64,33 @@ On Compute Canada clusters Cedar and Graham we have two versions of Chapel, one 
 single-locale Chapel. If you are logged into Cedar or Graham, you'll need to load the single-locale
 Chapel module:
 
-~~~
+```
 module load gcc
 module load chapel-single
-~~~
+```
 {: .bash}
 
 Then, for running a test code on a cluster you would submit an interactive job to the queue
 
-~~~
+```
 salloc --time=0:30:0 --ntasks=1 --cpus-per-task=3 --mem-per-cpu=1000 --account=def-guest
-~~~
+```
 {: .bash}
 
 and then inside that job compile and run the test code
 
-~~~
+```
 chpl --fast hello.chpl -o hello
 ./hello
-~~~
+```
 {: .bash}
 
 For production jobs, you would compile the code and then submit a batch script to the queue:
 
-~~~
+```
 chpl --fast hello.chpl -o hello
 sbatch script.sh
-~~~
+```
 {: .bash}
 
 where the script `script.sh` would set all Slurm variables and call the executable `hello`.
@@ -120,3 +120,5 @@ So, our objective is to:
 > 2. Use task parallelism to improve the performance of the code and run it in the cluster
 > 3. Use data parallelism to improve the performance of the code and run it in the cluster.
 {:.checklist}
+
+{% include links.md %}

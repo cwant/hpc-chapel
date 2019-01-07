@@ -55,3 +55,5 @@ a. the local memory on the compute node where it is running, or
 b. on distributed memory located in other compute nodes. 
 ```
  And again, Chapel could take care of all the stuff required to run our algorithm in most of the scenarios, but we can always add more specific detail to gain performance when targeting a particular scenario.
+
+{% include links.md %}

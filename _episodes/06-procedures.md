@@ -1,4 +1,4 @@
---
+---
 title: "Procedures for functional programming"
 teaching: 15
 exercises: 0
@@ -22,7 +22,7 @@ proc addOne(n) { // n is an input parameter
 }
 writeln(addOne(10));
 ~~~
-{:.source}
+{: .source}
 
 Procedures can be recursive:
 
@@ -33,11 +33,11 @@ proc fibonacci(n: int): int {
 }
 writeln(fibonacci(10));
 ~~~
-{:.source}
+{: .source}
 
 They can take a variable number of parameters:
 
-~~~~
+~~~
 proc maxOf(x ...?k) { // take a tuple of one type with k elements
   var maximum = x[1];
   for i in 2..k do maximum = if maximum < x[i] then x[i] else maximum;
@@ -45,7 +45,7 @@ proc maxOf(x ...?k) { // take a tuple of one type with k elements
 }
 writeln(maxOf(1, -5, 123, 85, -17, 3));
 ~~~
-{:.source}
+{: .source}
 
 Procedures can have default parameter values:
 
@@ -58,8 +58,9 @@ writeln(returnTuple(x=2));
 writeln(returnTuple(x=-10, y=10));
 writeln(returnTuple(y=-1, x=3)); // the parameters can be named out of order
 ~~~
-{:.source}
+{: .source}
 
 Chapel procedures have many other useful features, however, they are not essential for learning task and
 data parallelism, so we refer the interested readers to the official Chapel documentation.
 
+{% include links.md %}

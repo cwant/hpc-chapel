@@ -341,14 +341,22 @@ solution in time, this peak should diffuse slowly over the rest of the domain.
 
 > ## Question
 > Why do we have  
+> ```
 > forall (i,j) in T.domain[1..n,1..n] {  
+> ```
+> {: .source}
 > and not  
+> ```
 > forall (i,j) in mesh
+> ```
+> {: .source}
+> ?
 >> ## Answer
 >> The first one will run on multiple locales in parallel, whereas the
 >> second will run in parallel via multiple threads on locale 0 only, since
 >> "mesh" is defined on locale 0.
->> {:.source}
+> {: .solution}
+{: .challenge}
 
 The code above will print the initial temperature distribution:
 
@@ -398,7 +406,12 @@ The outer perimeter in the partition below are the *ghost points*:
 > from here.id?
 >> ## Solution
 >> Something along the lines:
+>> ~~~
 >>   m = "%i".format(here.id) + '-' + m.locale.id
+>> ~~~
+>> {: .source}
+> {: .solution}
+{: .challenge}
 
 Now we implement the parallel solver, by adding the following to our code (*contains a mistake on
 purpose!*):
@@ -417,11 +430,19 @@ for step in 1..5 { // time-stepping
 > Can anyone see a mistake in the last code?
 >> ## Solution
 >> It should be  
+>>   ```
 >>   forall (i,j) in Tnew.domain[1..n,1..n] do  
->> instead of  
->>   forall (i,j) in mesh do  
+>>   ```
+>>   {: .source}
+>> instead of
+>>   ```
+>>   forall (i,j) in mesh do
+>>   ```
+>>   {: .source}
 >> as the last one will likely run in parallel via threads only on locale 0,
 >> whereas the former will run on multiple locales in parallel.
+> {: .solution}
+{: .challenge}
 
 Here is the final version of the entire code:
 
@@ -473,6 +494,8 @@ Notice how the total energy decreases in time with the open boundary conditions,
 >>     nodeID[i+1,j].locale.id + nodeID[i,j-1].locale.id + nodeID[i,j+1].locale.id + '  ';
 >> writeln(nodeID);
 >> ~~~
+> {: .solution}
+{: .challenge}
 
 This produced the following output clearly showing the *ghost points* and the stencil distribution for
 each mesh point:
@@ -536,3 +559,4 @@ Run the code and check the file *output.dat*: it should contain the array T afte
 * take a simple non-linear problem, linearise it, implement a parallel multi-locale linear solver
   entirely in Chapel
 
+{% include links.md %}
