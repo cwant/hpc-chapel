@@ -31,8 +31,8 @@ writeln(4 ** 5);  // exponentiation
 In this example, our code is called `operators.chpl`. 
 You can compile it with the following commands:
 ```
-chpl operators.chpl --fast -o operators.o
-./operators.o
+chpl operators.chpl --fast -o operators
+./operators
 ```
 {: .bash}
 
@@ -91,8 +91,8 @@ writeln(test / 4);
 ~~~
 {: .source}
 ```
-chpl variables.chpl -o variables.o --fast
-./variables.o
+chpl variables.chpl -o variables --fast
+./variables
 ```
 {: .bash}
 ```
@@ -113,7 +113,7 @@ writeln(test / 4);
 ~~~
 {: .source}
 ```
-chpl variables.chpl -o variables.o
+chpl variables.chpl -o variables
 ```
 {: .bash}
 ```
@@ -146,7 +146,8 @@ writeln(test / 4);
 ~~~
 {: .source}
 ```
-chpl variables.chpl -o variables.o
+chpl variables.chpl -o variables
+./variables
 ```
 {: .bash}
 ```
@@ -164,35 +165,54 @@ We also know how to read and interpret errors.
 On the other hand, if a variable is declared without an initial value, Chapel will initialise it with a default value depending on the declared type (0.0 for real variables, for example). The following variables will be created as real floating point numbers equal to 0.0.
 
 ~~~
-var curdif: real;	//here we will store the greatest difference in temperature from one iteration to another 
-var tt: real;		//for temporary results when computing the temperatures
+// Greatest difference in temperature from one iteration to another
+var current_diff: real;
+
+// Temporary results when computing the temperatures
+var temp: real;
 ~~~
 {: .source}
 
 Of course, we can use both, the initial value and the type, when declaring a variable as follows:
 
 ~~~
-const mindif=0.0001: real;	//smallest difference in temperature that would be accepted before stopping
-const n=20: int;		//the temperature at the desired position will be printed every n iterations
+// Smallest difference in temperature that would be accepted before stopping
+const min_diff = 0.0001: real;
+
+// Print temperature every print_iterations iterations
+const print_iterations = 20: int;
 ~~~
 {: .source}
 
-*This is not necessary, but it could help to make the code more readable.*
+(`print_iterations` is not necessary, but it could help to make the code more readable.)
 
 
 Let's practice defining variables and use this as the starting point of our simulation code.
 In these examples, our simulation will be in the file `base_solution.chpl`.
 
 ```
-const rows = 100;               // number of rows in matrix
-const cols = 100;               // number of columns in matrix
-const niter = 500;              // number of iterations
-const x = 50;                   // row number of the desired position
-const y = 50;                   // column number of the desired position
-var curdif: real;               // here we will store the greatest difference in temperature from one iteration to another 
-var tt: real;                   // for temporary results when computing the temperatures
-const mindif = 0.0001: real;    // smallest difference in temperature that would be accepted before stopping
-const n = 20: int;              // the temperature at the desired position will be printed every n iterations
+// Number of rows and columns in matrix 
+const rows = 100;
+const cols = 100;
+
+// Number of iterations
+const num_iterations = 500;
+
+// Row and column of desired position
+const x = 50;
+const y = 50;
+
+// Greatest difference in temperature from one iteration to another
+var current_diff: real;
+
+// Temporary results when computing the temperatures
+var temp: real;
+
+// Smallest difference in temperature that would be accepted before stopping
+const min_diff = 0.0001: real;
+
+// Print temperature every print_iterations iterations
+const print_iterations = 20: int;
 ```
 {: .source}
 
