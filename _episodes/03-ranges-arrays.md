@@ -222,6 +222,8 @@ var temperature: [0..rows+1, 0..cols+1] real = 25;
 var current_diff: real;
 
 writeln('This simulation will consider a matrix of ', rows, ' by ', cols, ' elements.');
+writeln('We will look at the temperature at the location x = ', x,
+        ', y = ', y, '.');
 writeln('Temperature at start is: ', temperature[x, y]);
 ~~~
 {: .source}
@@ -232,6 +234,7 @@ writeln('Temperature at start is: ', temperature[x, y]);
 {: .input}
 ~~~
 This simulation will consider a matrix of 100 by 100 elements.
+We will look at the temperature at the location x = 50, y = 50.
 Temperature at start is: 25.0
 ~~~
 {: .output}
