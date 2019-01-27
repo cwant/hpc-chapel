@@ -106,4 +106,95 @@ configurable variables, and test the code simulating different configurations.
 > {: .solution}
 {: .challenge}
 
+At the end of this exercise, or program should look like this:
+
+```
+// Number of rows and columns in matrix
+config const rows = 100;
+config const cols = 100;
+
+// Number of iterations
+config const num_iterations = 500;
+
+// Row and column of desired position
+config const x = 1;
+config const y = 1;
+
+// Smallest difference in temperature that would be accepted before stopping
+config const min_diff = 0.0001: real;
+
+// Print temperature every print_iterations iterations
+config const print_iterations = 20: int;
+
+// This is our "plate" of temperature values
+var temperature: [0..rows+1, 0..cols+1] real = 0.0;
+
+// Set initial condition in interior
+temperature[1..rows, 1..cols] = 25.0;
+
+// Temporary storage for newly computed values
+var temperature_new: [0..rows+1, 0..cols+1] real;
+
+// Greatest difference in temperature from one iteration to another
+var current_diff: real;
+
+writeln('This simulation will consider a matrix of ', rows, ' by ', cols, ' elements.');
+writeln('We will look at the temperature at the location x = ', x,
+        ', y = ', y, '.');
+writeln('We will run up to ', num_iterations, ' iterations, or until ',
+        'the largest difference in temperature between iterations is ',
+        'less than ', min_diff, '.');
+
+writeln('\nTemperature at start is: ', temperature[x, y]);
+
+current_diff = min_diff;
+
+// This is the main loop of the simulation
+var c = 0;
+while (c < num_iterations && current_diff >= min_diff) do
+{
+  // Calculate the new temperatures (temperature_new) using the
+  // existing temperatures (temperature)
+  for i in 1..rows do
+  {
+    for j in 1..cols do
+    {
+      temperature_new[i,j] = (temperature[i-1, j] +
+                              temperature[i+1, j] +
+                              temperature[i, j-1] +
+                              temperature[i, j+1]) / 4;
+    }
+  }
+  var this_diff = 0.0;
+
+  // Update current_diff
+  current_diff = 0;
+  for i in 1..rows do
+  {
+    for j in 1..cols do
+    {
+      this_diff = abs(temperature_new[i, j] - temperature[i, j]);
+      if this_diff > current_diff then current_diff = this_diff;
+    }
+  }
+  temperature = temperature_new;
+
+  c += 1;
+  if (c % print_iterations == 0)
+  {
+    writeln('Temperature at iteration ', c, ': ', temperature[x, y]);
+  }
+
+}
+
+// Print final information
+writeln('\nFinal temperature at x = ', x, ', y = ', y, ' after ', c,
+        ' iterations is: ', temperature[x,y]);
+writeln('The largest difference in temperatures between ',
+        'the last two iterations was: ',
+        current_diff, '\n');
+
+```
+{: .code}
+
 {% include links.md %}
