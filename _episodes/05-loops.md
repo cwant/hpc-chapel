@@ -146,9 +146,11 @@ writeln('We will run up to ', num_iterations, ' iterations, or until ',
 
 writeln('\nTemperature at start is: ', temperature[x, y]);
 
+current_diff = min_diff;
+
 // This is the main loop of the simulation
 var c = 0;
-while (c < num_iterations) do
+while (c < num_iterations && current_diff >= min_diff) do
 {
   // Calculate the new temperatures (temperature_new) using the
   // existing temperatures (temperature)
