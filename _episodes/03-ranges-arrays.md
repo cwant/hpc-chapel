@@ -13,7 +13,7 @@ keypoints:
 - "You can index arrays with the `[]` brackets."
 ---
 
-## Ranges and Arrays
+## Ranges
 
 A series of integers (1,2,3,4,5, for example), is called a **_range_**. 
 Ranges are generated with the `..` operator, and are useful, among other things, to declare **arrays** of variables.
@@ -34,6 +34,8 @@ chpl ranges.chpl -o ranges
 Our example range was set to: 0..10
 ```
 {: .output}
+
+## Arrays
 
 An **array** is a multidimensional sequence of values. 
 Arrays can be any size, and are defined using ranges:

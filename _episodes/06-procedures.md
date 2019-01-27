@@ -1,5 +1,5 @@
 ---
-title: "Procedures for functional programming"
+title: "Procedures for organizing code"
 teaching: 15
 exercises: 0
 questions:

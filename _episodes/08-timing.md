@@ -15,6 +15,8 @@ the basic implementation of our simulation. We will use it as a benchmark,
 to see how much we can improve the performance when introducing the
 parallel programming features of the language in the following lessons. 
 
+## The UNIX `time` command
+
 But first, we need a quantitative way to measure the performance of our code.
 The easiest way to do it is to see how long it takes to finish a simulation.
 The UNIX command `time` could be used to this effect
@@ -52,6 +54,8 @@ sys     0m0.035s
 
 The real time is what interests us. Our code is taking around 3 minutes
 from the moment it is called at the command line until it returns. 
+
+## The Chapel `Time` module
 
 Some times, however, it could be useful to take the execution time of
 specific parts of the code. This can be achieved by modifying the code to
