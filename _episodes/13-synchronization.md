@@ -5,10 +5,10 @@ exercises: 30
 questions:
 - "How should I access my data in parallel?"
 objectives:
-- "First objective."
+- "Learn some more synchronization workflows."
 keypoints:
 - "You can explicitly synchronise tasks with `sync` statement."
-- "You can also use sync and atomic variables to synchronise tasks."
+- "You can also use `sync` and `atomic` variables to synchronise tasks."
 ---
 
 ## The `sync` keyword
@@ -217,17 +217,21 @@ Notice that we needed to assign `value_we_need` to something else
 There are a number of methods defined for `sync` variables.
 Suppose `x` is a sync variable of a given type, 
 
-```
-// **** General methods ****
 
+### General methods
+
+```
 // Set the state as empty and the value as the default of x's type
 x.reset()
 
 // Return true is the state of x is full, false if it is empty
 x.isfull()
+```
+{: .code}
 
-// **** Blocking read/write methods ****
+### Blocking read/write methods
 
+```
 // Block until the state of x is empty, then assign value to set the state to full 
 x.writeEF(value)
 
@@ -239,15 +243,19 @@ x.readFE()
 
 // Block until x is full, then return x's value, but leave the state as full
 x.readFF()
+```
+{: .code}
 
-// **** Non-blocking read/write methods ****
+### Non-blocking read/write methods
 
+```
 // Assign the value no matter the state of x, and then set the state as full
 x.writeXF(value)
 
 // Return the value of x regardless of state. The state will remain unchanged
 x.readXX()
 ```
+{: .code}
 
 ## The `atomic` type qualifier 
 
@@ -310,7 +318,7 @@ Task 4 is done...
 {: .output}
 
 > ## Try this...
-> Comment out the line `lock.waitfor(num_tasks)` in the code above to
+> Comment out the line `lock.waitfor(num_tasks);` in the code above to
 > clearly observe the effect of the task synchronisation.
 {: .challenge}
 
