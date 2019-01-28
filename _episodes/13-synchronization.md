@@ -108,7 +108,7 @@ writeln("The first task is done...");
 > Discuss your observations. 
 {: .discussion}
 
-> ## Exercise 3
+> ## Exercise
 > Use `begin` and `sync` statements to reproduce the functionality of `cobegin` in cobegin_example.chpl.
 >> ## Solution
 >> ~~~
