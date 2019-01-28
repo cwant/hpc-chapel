@@ -5,58 +5,80 @@ exercises: 30
 questions:
 - "How do I write parallel code for a real use case?"
 objectives:
-- "First objective."
+- "Writing task parallel code."
 keypoints:
 - "There are many ways to implement task parallelism for the diffusion solver."
 ---
 
-The parallelization of our base solution for the heat transfer equation can be achieved following the ideas of Exercise 2. The entire grid of points can be divided and assigned to multiple tasks. Each tasks should compute the new temperature of its assigned points, and then we must perform a **_reduction_**, over the whole grid, to update the greatest difference in temperature. 
+The parallelization of our base solution for the heat transfer
+equation can be achieved following the ideas of preceding sections.
 
-For the reduction of the grid we can simply use the `max reduce` statement, which is already parallelized. Now, let's divide the grid into `rowtasks` x `coltasks` sub-grids, and assign each sub-grid to a task using the `coforall` loop (we will have `rowtasks*coltasks` tasks in total).
+The entire grid of points can be divided and assigned to multiple tasks.
+Each task should compute the new temperature of its assigned points,
+and then we must perform a **reduction**, over the whole grid, to update
+the greatest difference in temperature. 
+
+For the reduction of the grid we can simply use the `max reduce` statement,
+which is already parallelized. Now, let's divide the grid into
+`row_tasks` x `col_tasks` sub-grids, and assign each sub-grid to a task
+using a `coforall` loop (we will have `row_tasks * col_tasks` tasks in total).
 
 ~~~
-config const rowtasks = 2;
-config const coltasks = 2;
+config const row_tasks = 2;
+config const col_tasks = 2;
 
 // this is the main loop of the simulation
-curdif = mindif;
-while (c<niter && curdif>=mindif) do {
+current_diff = min_diff;
+while (c < num_iterations && current_diff >= min_diff) do {
   c += 1;
 
-  coforall taskid in 0..coltasks*rowtasks-1 do {
-    for i in rowi..rowf do {
-      for j in coli..colf do {
-        temp[i,j] = (past_temp[i-1,j]+past_temp[i+1,j]+past_temp[i,j-1]+past_temp[i,j+1]) / 4;
+  coforall task_id in 0..(col_tasks * row_tasks - 1) do {
+    for i in row_first..row_last do {
+      for j in col_first..col_last do {
+        temperature_new[i, j] = (temperature[i - 1, j] +
+                                 temperature[i + 1, j] +
+                                 temperature[i, j - 1] +
+                                 temperature[i, j + 1]) / 4.0;
       }
     }
   }
 
-  curdif = max reduce (temp-past_temp);
-  past_temp = temp;
-  
-  if c%n == 0 then writeln('Temperature at iteration ',c,': ',temp[x,y]);
+  current_diff = max reduce (temperature_new - temperature);
+  temperature = temperature_new;
+
+  // ...
 }
 ~~~
 {: .source}
 
-Note that now the nested for loops run from `rowi` to `rowf` and from `coli` to `colf` which are, respectively, the initial and final row and column of the sub-grid associated to the task `taskid`. To compute these limits, based on `taskid`, we can again follow the same ideas as in Exercise 2.
+Note that now the nested for-loops run from `row_first` to `row_last`
+and from `col_first` to `col_last` which are, respectively, the initial
+and final row and column of the sub-grid associated to the task `task_id`.
+To compute these limits, based on `task_id`, we can again follow the same
+ideas we've seen previously.
 
 ~~~
-config const rowtasks = 2;
-config const coltasks = 2;
+config const row_tasks = 2;
+config const col_tasks = 2;
 
-const nr = rows/rowtasks;
-const rr = rows-nr*rowtasks;
-const nc = cols/coltasks;
-const rc = cols-nc*coltasks;
+const row_length = rows / row_tasks;
+const row_remainder = rows % row_tasks;
+const col_length = cols / col_tasks;
+const col_remainder = cols % col_tasks;
 
-// this is the main loop of the simulation
-curdif = mindif;
-while (c<niter && curdif>=mindif) do {
-  c+=1;
+// This is the main loop of the simulation
+current_diff = min_diff;
+while (c < num_iterations && current_diff >= min_diff) do {
+  c += 1;
 
-  coforall taskid in 0..coltasks*rowtasks-1 do {
-    var rowi, coli, rowf, colf: int;
+  coforall task_id in 0..(col_tasks * row_tasks - 1) do {
+    var task_first_col = (task_id - 1) *  ;
+    var task_last_col = ;
+
+    var task_first_row = ;
+    var task_last_row = ;
+
+rowi, coli, rowf, colf: int;
     var taskr, taskc: int;
 
     taskr = taskid/coltasks;
