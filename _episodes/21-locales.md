@@ -11,179 +11,284 @@ keypoints:
 - "We can cycle in serial or parallel through all locales."
 ---
 
-So far we have been working with single-locale Chapel codes that may run on one or many cores on a single
-compute node, making use of the shared memory space and accelerating computations by launching concurrent
-tasks on individual cores in parallel. Chapel codes can also run on multiple nodes on a compute
-cluster. In Chapel this is referred to as *multi-locale* execution.
+So far we have been working with **single-locale** (one machine) Chapel
+codes that may run on one or many cores on a single
+compute node.
 
-If you work inside a Chapel Docker container, e.g., chapel/chapel-gasnet, the container environment
-simulates a multi-locale cluster, so you would compile and launch multi-locale Chapel codes directly by
-specifying the number of locales with `-nl` flag:
+Our programs have made use of the **shared memory space** of a
+single machine, and have accelerated computations by launching concurrent
+tasks on individual cores in parallel.
 
-```
-$ chpl --fast mycode.chpl -o mybinary
-$ ./mybinary -nl 4
-```
-{: .input}
+Chapel codes can also run on multiple machines (nodes) on a compute
+cluster. In Chapel this is referred to as **multi-locale** execution.
 
-Inside the Docker container on multiple locales your code will not run any faster than on a single
-locale, since you are emulating a virtual cluster, and all tasks run on the same physical node. To
-achieve actual speedup, you need to run your parallel multi-locale Chapel code on a real physical
-cluster which we hope you have access to for this session.
-
-On a real HPC cluster you would need to submit either an interactive or a batch job asking for several
-nodes and then run a multi-locale Chapel code inside that job. In practice, the exact commands depend on
-how the multi-locale Chapel was built on the cluster.
-
-When you compile a Chapel code with the multi-locale Chapel compiler, two binaries will be produced. One
-is called `mybinary` and is a launcher binary used to submit the real executable `mybinary_real`. If the
-Chapel environment is configured properly with the launcher for the cluster's physical interconnect
-(which might not be always possible due to a number of factors), then you would simply compile the code
-and use the launcher binary `mybinary` to submit the job to the queue:
+We will get set up for multi-locale work by first creating a very
+simple script called `locales.chpl`:
 
 ```
-$ chpl --fast mycode.chpl -o mybinary
-$ ./mybinary -nl 2
-```
-{: .input}
-
-The exact parameters of the job such as the maximum runtime and the requested memory can be specified
-with Chapel environment variables. One drawback of this launching method is that Chapel will have access
-to all physical cores on each node participating in the run -- this will present problems if you are
-scheduling jobs by-core and not by-node, since part of a node should be allocated to someone else's job.
-
-The Compute Canada clusters Cedar and Graham employ two different physical interconnects, and since we
-use exactly the same multi-locale Chapel module on both clusters
-
-```
-$ module load gcc
-$ module load chapel-slurm-gasnetrun_ibv/1.15.0
-$ export GASNET_PHYSMEM_MAX=1G      # needed for faster job launch
-$ export GASNET_PHYSMEM_NOPROBE=1   # needed for faster job launch
-```
-{: .input}
-
-we cannot configure the same single launcher for both. Therefore, we launch multi-locale Chapel codes
-using the real executable `mybinary_real`. For example, for an interactive job you would type:
-
-```
-$ salloc --time=0:30:0 --nodes=4 --cpus-per-task=3 --mem-per-cpu=1000 --account=def-guest
-$ chpl --fast mycode.chpl -o mybinary
-$ srun ./mybinary_real -nl 4   # will run on four locales with max 3 cores per locale
-```
-{: .input}
-
-Production jobs would be launched with `sbatch` command and a Slurm launch script as usual.
-
-For the rest of this class we assume that you have a working multi-locale Chapel environment, whether
-provided by a Docker container or by multi-locale Chapel on a physical HPC cluster. We will run all
-examples on four nodes with three cores per node.
-
-# Intro to multi-locale code
-
-Let us test our multi-locale Chapel environment by launching the following code:
-
-~~~
 writeln(Locales);
-~~~
-{: .source}
+```
+{: .code}
 
-This code will print the built-in global array `Locales`. Running it on four locales will produce
+This code will print the built-in global array `Locales`, a list of
+locales that our program has access to (these locales are usually
+provisioned through a scheduler).
+
+Before we can do anything else though, we will need to do some setup to
+compile and run this small program.
+
+## Setup
+
+Setting up chapel to run multi-locale can be tricky, as the software
+is tied closely to both the scheduler used and the interconnect
+(the networking between nodes) of the cluster. Chapel (mostly)
+assumes that your jobs will be spawned through a scheduler.
+
+### If you are on our training cluster ...
+
+To compile the multi-locale program, we need to configure our environment
+first:
+
+```
+module unload chapel-single
+source ~centos/start-chapel-multi-locale.sh
+```
+{: .code}
+
+We can now compile our program as usual:
+
+```
+chpl --fast locales.chpl -o locales
+```
+{: .code}
+
+We will submit our job to our cluster using the following
+submission script `locales_submit.sh`:
+
+```
+#!/bin/bash
+#SBATCH --time=00:05:00
+#SBATCH --mem-per-cpu=1000
+#SBATCH --nodes=4
+#SBATCH --cpus-per-task=3
+#SBATCH --output=locales.txt
+
+./locales -nl 4
+```
+{: .code}
+
+And submit it to the cluster:
+
+```
+sbatch locales_submit.sh
+```
+{: .code}
+
+Skip the next session, as it doesn't apply to the training cluster
+(you may want to revisit it later if you start submitting jobs to
+Compute Canada machines).
+
+### If you are on a 'real' Compute Canada cluster ...
+
+To compile the multi-locale program on `cedar` (for example), we need to
+configure our environment first:
+
+```
+# This might be needed if we were doing previous chapel work:
+module unload chapel-single
+
+module load gcc
+module load chapel-slurm-gasnetrun_ibv
+# Or if you want a specific version do:
+# module load chapel-slurm-gasnetrun_ibv/1.15.0
+```
+{: .code}
+
+We can now compile our program as usual:
+
+```
+chpl --fast locales.chpl -o locales
+```
+{: .code}
+
+We will submit our job to the cluster using the following
+submission script `locales_submit.sh`, but keep in mind that
+you will need to provide a valid accounting group below:
+
+```
+#!/bin/bash
+#SBATCH --time=00:05:00
+#SBATCH --mem-per-cpu=1000
+#SBATCH --nodes=4
+#SBATCH --cpus-per-task=3
+#SBATCH --output=locales.txt
+#SBATCH --account=YOUR-ACCOUNTING-GROUP-HERE
+
+# The following prevent out-of-memory errors ...
+export GASNET_PHYSMEM_MAX=1G
+export GASNET_PHYSMEM_NOPROBE=1
+
+srun ./locale_real -nl 4
+```
+{: .code}
+
+And submit it to the cluster:
+
+```
+sbatch locales_submit.sh
+```
+{: .code}
+
+## What just happened?
+
+A few things to note about the job we queued:
+
+* We have asked for three CPUs of four machines;
+* We have asked for a maximum of 1GB of memory per CPU
+  (`--mem-per-cpu` is expressed in MB);
+* We have requested that the scheduler run our job for a maximum of
+  five minutes (the job will take much less than that to run);
+* We have requested that the output from the program be placed in the
+  file `locales.txt`
+
+Also, you will notice that the program we have run has the command line
+option `-nl 4`. This indicates that the number of locales (different machines
+to run on) is 4.
+
+You can use `squeue` to see if your job has run. When it completes, we
+can inspect the output in `locales.txt`:
 
 ~~~
 LOCALE0 LOCALE1 LOCALE2 LOCALE3
 ~~~
 {: .output}
 
-We want to run some code on each locale (node). For that, we can cycle through locales:
+This is not terribly informative, but lets us know that our program
+does indeed have acces to four machines.
+
+## Getting some more information
+
+Let's modify our code in `locales.chpl` to get some more information
+about the locales. To do this, we will actually run some code on
+each locale:
+
+```
+for loc in Locales do {
+  on loc do {
+    writeln("Locale ", loc, " is named ", here.name);
+  }
+}
+```
+{: .code}
+
+We are starting a **serial** `for` loop, cycling through
+all locales, and on each locale we print the locale's name
+(the hostname of each node).
+
+The built-in variable class `here` refers to the locale on which
+the code is running, and `here.name` is its hostname.
+
+Re-compile and re-submit your job:
+```
+chpl --fast locales.chpl -o locales
+sbatch locales_submit.sh
+```
+{: .bash}
+
+This will produce output similar to
 
 ~~~
-for loc in Locales do   // this is still a serial program
-  on loc do             // run the next line on locale `loc`
-    writeln("this locale is named ", here.name);
+Locale LOCALE0 is named node4.training.uofa.c3.ca
+Locale LOCALE1 is named node2.training.uofa.c3.ca
+Locale LOCALE2 is named node1.training.uofa.c3.ca
+Locale LOCALE3 is named node3.training.uofa.c3.ca
 ~~~
 {: .output}
 
-This will produce
+This program ran in serial, starting a task on each locale
+only after completing the same task on the previous locale.
 
-~~~
-this locale is named cdr544
-this locale is named cdr552
-this locale is named cdr556
-this locale is named cdr692
-~~~
-{: .output}
+Also of note: the node names of the locales are in an
+arbitrary order.
 
-Here the built-in variable class `here` refers to the locale on which the code is running, and
-`here.name` is its hostname. We started a serial `for` loop cycling through all locales, and on each
-locale we printed its name, i.e., the hostname of each node. This program ran in serial starting a task
-on each locale only after completing the same task on the previous locale. Note the order in which
-locales were listed.
-
-To run this code in parallel, starting four simultaneous tasks, one per locale, we simply need to replace
+To run this code in **parallel**, starting four simultaneous tasks
+(one per locale) we can simply replace
 `for` with `forall`:
 
-~~~
-forall loc in Locales do   // now this is a parallel loop
-  on loc do
-    writeln("this locale is named ", here.name);
-~~~
-{: .source}
+```
+forall loc in Locales do {
+  on loc do {
+    writeln("Locale ", loc, " is named ", here.name);
+  }
+}
+```
+{: .code}
 
-This starts four tasks in parallel, and the order in which the print statement is executed depends on the
-runtime conditions and can change from run to run:
+Four tasks will start in parallel when you re-compile and
+re-submit the job.
+
+The output looks similar to before, except perhaps the order
+and the names may differ depending on
+runtime conditions:
 
 ~~~
-this locale is named cdr544
-this locale is named cdr692
-this locale is named cdr556
-this locale is named cdr552
+Locale LOCALE0 is named node1.training.uofa.c3.ca
+Locale LOCALE3 is named node3.training.uofa.c3.ca
+Locale LOCALE2 is named node2.training.uofa.c3.ca
+Locale LOCALE1 is named node4.training.uofa.c3.ca
 ~~~
 {: .output}
 
-We can print few other attributes of each locale. Here it is actually useful to revert to the serial loop
+We can print some other attributes of each locale.
+Here it is actually useful to revert to the serial loop
 `for` so that the print statements appear in order:
 
 ~~~
 use Memory;
-for loc in Locales do
+
+for loc in Locales do {
   on loc {
-    writeln("locale #", here.id, "...");
-    writeln("  ...is named: ", here.name);
-    writeln("  ...has ", here.numPUs(), " processor cores");
-    writeln("  ...has ", here.physicalMemory(unit=MemUnits.GB, retType=real), " GB of memory");
-    writeln("  ...has ", here.maxTaskPar, " maximum parallelism");
+    writeln("Locale #", here.id, " (", loc, ") ...");
+    writeln("  * is named: ", here.name);
+    writeln("  * has ", here.numPUs(), " processor cores");
+    writeln("  * has ", here.physicalMemory(unit=MemUnits.GB, retType=real), " GB of memory");
+    writeln("  * has ", here.maxTaskPar, " maximum parallelism");
   }
+}
 ~~~
 {: .source}
 
+Re-compile/re-submit yeilds the output in `locales.txt`:
+
 ~~~
-locale #0...
-  ...is named: cdr544
-  ...has 3 processor cores
-  ...has 125.804 GB of memory
-  ...has 3 maximum parallelism
-locale #1...
-  ...is named: cdr552
-  ...has 3 processor cores
-  ...has 125.804 GB of memory
-  ...has 3 maximum parallelism
-locale #2...
-  ...is named: cdr556
-  ...has 3 processor cores
-  ...has 125.804 GB of memory
-  ...has 3 maximum parallelism
-locale #3...
-  ...is named: cdr692
-  ...has 3 processor cores
-  ...has 125.804 GB of memory
-  ...has 3 maximum parallelism
+Locale #0 (LOCALE0):
+  * is named: node2.training.uofa.c3.ca
+  * has 3 processor cores
+  * has 7.14685 GB of memory
+  * has 3 maximum parallelism
+Locale #1 (LOCALE1):
+  * is named: node3.training.uofa.c3.ca
+  * has 3 processor cores
+  * has 7.14685 GB of memory
+  * has 3 maximum parallelism
+Locale #2 (LOCALE2):
+  * is named: node4.training.uofa.c3.ca
+  * has 3 processor cores
+  * has 7.14685 GB of memory
+  * has 3 maximum parallelism
+Locale #3 (LOCALE3):
+  * is named: node1.training.uofa.c3.ca
+  * has 3 processor cores
+  * has 7.14685 GB of memory
+  * has 3 maximum parallelism
 ~~~
 {: .output}
 
-Note that while Chapel correctly determines the number of cores available inside our job on each node,
-and the maximum parallelism (which is the same as the number of cores available!), it lists the total
-physical memory on each node available to all running jobs which is not the same as the total memory per
-node allocated to our job.
+Note that while Chapel correctly determines the number of cores
+available inside our job on each node,
+and the **maximum parallelism** (which is the same as the number
+of cores available!), it lists the **total physical memory** on
+each node available to all running jobs which is not the same as
+the total memory per node allocated to our job.
 
 {% include links.md %}
