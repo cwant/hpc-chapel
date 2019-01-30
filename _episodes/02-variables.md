@@ -205,9 +205,6 @@ const y = 50;
 // Greatest difference in temperature from one iteration to another
 var current_diff: real;
 
-// Temporary results when computing the temperatures
-var temp: real;
-
 // Smallest difference in temperature that would be accepted before stopping
 const min_diff = 0.0001: real;
 
